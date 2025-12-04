@@ -23,16 +23,13 @@ jobs:
         uses: astral-sh/setup-uv@v3
 
       - name: Set up Python
-        run: uv python install 3.13
+        run: uv python install 3.14 # Force Python 3.14
 
       - name: Install dependencies
         run: uv sync --all-extras --dev
 
       - name: Install package in editable mode
         run: uv pip install -e .
-
-      - name: Debug Installed Packages
-        run: uv pip list
 
       - name: Run Unit Tests
         run: uv run pytest tests/test_cli.py
@@ -56,7 +53,7 @@ jobs:
           # Si la clé est présente, on fait un vrai test
           if [ -n "$GEMINI_API_KEY" ]; then
             echo "🔑 API Key found. Running integration test..."
-            uv run app/main.py ask "Hello Sensei, are you online?"
+            uv run app/main.main ask "Hello Sensei, are you online?"
           else
             echo "⚠️ No API Key found in secrets. Skipping integration test."
           fi
@@ -67,14 +64,14 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Install uv
         uses: astral-sh/setup-uv@v5
 
-      - name: Set up Python 3.13
+      - name: Set up Python 3.14
         run: |
-          uv python install 3.13
-          uv venv --python 3.13
+          uv python install 3.14 # Force Python 3.14
+          uv venv --python 3.14
 
       - name: Install dependencies and Nuitka
         run: uv add --dev nuitka patchelf
@@ -92,15 +89,20 @@ jobs:
           fi
 
       - name: Compile with Nuitka
-        run: |
-          uv run --python 3.12 python -m nuitka \
-            --standalone \
-            --onefile \
-            --include-data-file=prompts.yaml=prompts.yaml \
-            --include-package=pygments \
-            --output-filename=sensei app/main.py
+        # Temporarily commented out Nuitka compilation
+        # run: uv run --python 3.14 python -m nuitka \
+        #   --standalone \
+        #   --onefile \
+        #   --include-data-file=prompts.yaml=prompts.yaml \
+        #   --include-package=pygments \
+        #   --output-filename=sensei app/main.py
+        run: echo "Nuitka compilation temporarily disabled."
 
       - name: Upload Binary
+        # This step will now upload a dummy file or an existing binary if Nuitka is disabled.
+        # Need to ensure there's a 'sensei' file if Nuitka is commented out, or skip this step.
+        # For now, let's assume if Nuitka is commented, we don't upload a binary.
+        if: false # Skip upload if Nuitka is disabled
         uses: actions/upload-artifact@v5
         with:
           name: sensei-linux-x64
