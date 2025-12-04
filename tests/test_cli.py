@@ -4,8 +4,8 @@ import os
 from typer.testing import CliRunner
 from unittest.mock import MagicMock, AsyncMock, patch
 
-# Hack pour inclure le dossier parent dans le path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Hack pour inclure le dossier parent dans le path (Prioritaire)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from sensei.main import app
 
