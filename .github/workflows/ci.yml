@@ -34,6 +34,15 @@ jobs:
         # Vérifie que le point d'entrée existe et est exécutable
         test -x run.sh
 
-    - name: Type Check (Optional)
-      # Si on ajoute mypy plus tard
-      run: echo "Skipping type check for now"
+    - name: Integration Test (Real API Call)
+      env:
+        GEMINI_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      run: |
+        # Si la clé est présente, on fait un vrai test
+        if [ -n "$GEMINI_API_KEY" ]; then
+          echo "🔑 API Key found. Running integration test..."
+          uv run main.py ask "Hello Sensei, are you online?"
+        else
+          echo "⚠️ No API Key found in secrets. Skipping integration test."
+        fi
+
