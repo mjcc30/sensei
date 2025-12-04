@@ -53,7 +53,7 @@ jobs:
           # Si la clé est présente, on fait un vrai test
           if [ -n "$GEMINI_API_KEY" ]; then
             echo "🔑 API Key found. Running integration test..."
-            uv run app/main.main ask "Hello Sensei, are you online?"
+            uv run -m app.main ask "Hello Sensei, are you online?"
           else
             echo "⚠️ No API Key found in secrets. Skipping integration test."
           fi
