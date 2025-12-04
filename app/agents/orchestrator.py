@@ -90,7 +90,11 @@ class ActionAgent(BaseAgent):
 class Orchestrator:
     def __init__(self, api_key: str, session_id: str = None):
         self.client = GeminiClient(api_key)
-        self.router = RouterAgent(self.client)
+        
+        # Load Router Prompt from Config
+        router_prompt = AGENT_CONFIG.get("router", {}).get("prompt")
+        self.router = RouterAgent(self.client, prompt_template=router_prompt)
+        
         self.knowledge = LocalKnowledge().get_context()
         self.memory = Memory()
         
