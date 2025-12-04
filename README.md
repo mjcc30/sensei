@@ -14,8 +14,8 @@
 ```bash
 git clone https://github.com/mjcc30/sensei.git
 cd sensei
-pip install -r requirements.txt
-python sensei.py "How do I scan for SMB vulnerabilities?"
+uv sync
+uv run main.py ask how do I scan for SMB vulnerabilities?
 ```
 
 ## 🤖 Usage
@@ -23,7 +23,14 @@ Set your API Key once:
 ```bash
 export GEMINI_API_KEY="your_key_here"
 ```
-Run interactive mode:
+
+**Quick Question:**
 ```bash
-python sensei.py --chat
+# No quotes needed!
+uv run main.py ask how do I use nmap stealthily?
+```
+
+**Interactive Mode:**
+```bash
+uv run main.py chat
 ```
