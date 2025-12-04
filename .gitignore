@@ -1,18 +1,43 @@
-# Python-generated files
+# Python
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
-
-# Virtual environments
-.venv
-prompts.yaml
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
 .env
-main.dist/
-sensei
-*.zip
+
+# Testing
+.pytest_cache/
 .coverage
+htmlcov/
+coverage.xml
+
+# Distribution / Build
+dist/
+build/
+*.egg-info/
+main.dist/
+main.build/
+sensei
+sensei-linux-x64
+*.zip
 nuitka-crash-report.xml
+*.bin
+*.so
+
+# Node / Prettier
 node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Mac
+.DS_Store
+
+# Local Configuration & Data
+prompts.yaml
+knowledge.db
+memory.db
+sensei_key
