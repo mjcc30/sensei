@@ -29,11 +29,40 @@ Sensei is currently a Single-Agent CLI tool. The goal is to evolve it into a Mul
 - [ ] **ActionAgent:** Create an agent capable of executing safe commands via MCP.
 
 ### 🚀 Phase 4: Release
+
 - [ ] **Merge:** Integrate `v2-swarm` into `main.py`.
+
 - [ ] **Release:** v2.0.0.
 
 
+
+### 🏛️ Phase 5: Architecture Evolution (v3.0)
+
+> Transition from Monolithic CLI to Client-Server Architecture.
+
+
+
+- [ ] **Sensei Server:**
+
+    - Build a **FastAPI** backend to host agents and tools.
+
+    - Implement MCP over SSE (Server-Sent Events) for remote control.
+
+    - Generate OpenAPI/Swagger documentation for easy AI integration.
+
+- [ ] **Sensei Client:**
+
+    - Rewrite CLI as a lightweight client querying the local/remote server.
+
+- [ ] **Distributed Swarm:**
+
+    - Allow agents to run on different machines (e.g., ReconAgent on a VPS, ReportAgent on local).
+
+
+
 ---
+
+
 
 ## 🛠️ v1.x - Enhancements
 - [ ] **Local LLM Support:** Add support for Ollama/Llama.cpp via `langchain` or direct API.
