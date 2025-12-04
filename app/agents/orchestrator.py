@@ -1,8 +1,9 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from .base import BaseAgent
 from .router import RouterAgent
 from ..core.llm import GeminiClient
 from ..core.knowledge import LocalKnowledge
+from ..core.memory import Memory
 from ..tools.nmap import NmapTool
 import asyncio
 import os
@@ -87,10 +88,22 @@ class ActionAgent(BaseAgent):
         return "⚠️ ActionAgent: I only support 'scan <target>' for now."
 
 class Orchestrator:
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, session_id: str = None):
         self.client = GeminiClient(api_key)
         self.router = RouterAgent(self.client)
-        self.knowledge = LocalKnowledge().get_context() # Load docs
+        self.knowledge = LocalKnowledge().get_context()
+        self.memory = Memory()
+        
+        # Resume or Start Session
+        if session_id:
+            self.memory.current_session_id = session_id
+        elif not self.memory.current_session_id:
+            # Try to resume last session by default (Short term memory)
+            last_id = self.memory.get_last_session()
+            if last_id:
+                self.memory.current_session_id = last_id
+            else:
+                self.memory.create_session()
         
         # Init workers
         self.agents: Dict[str, BaseAgent] = {
@@ -101,6 +114,9 @@ class Orchestrator:
         }
 
     async def handle_request(self, user_query: str) -> str:
+        # Save User Query
+        self.memory.add_message("user", user_query)
+        
         # 1. Routing & Optimization
         routing_data = await self.router.process(user_query)
         category = routing_data["category"]
@@ -111,4 +127,8 @@ class Orchestrator:
         
         # 3. Execution
         response = await worker.process(optimized_query)
+        
+        # Save Agent Response
+        self.memory.add_message("model", response)
+        
         return f"[{worker.id}] {response}"
