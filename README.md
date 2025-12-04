@@ -34,3 +34,21 @@ uv run main.py ask how do I use nmap stealthily?
 ```bash
 uv run main.py chat
 ```
+
+## ⚙️ Configuration & Customization
+
+Sensei uses a default persona ("Helpful Mentor"). You can customize or override these prompts (e.g., for specialized research or Red Teaming) by creating a `prompts.yaml` file.
+
+1.  Copy the example:
+    ```bash
+    cp prompts.example.yaml prompts.yaml
+    ```
+2.  Edit `prompts.yaml` to define your own System Prompts for each agent (Novice, Researcher, Master).
+3.  **Note:** `prompts.yaml` is ignored by Git to protect your custom methodology or sensitive instructions.
+
+## 🔬 Architecture (v2 - The Swarm)
+Sensei uses a **Multi-Agent Orchestrator**:
+1.  **Router:** Analyzes your query (Simple vs Complex).
+2.  **Specialists:** Delegates to the best agent (Novice, Researcher, or Master).
+3.  **A2A Bus:** Asynchronous internal communication.
+
