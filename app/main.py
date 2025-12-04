@@ -2,15 +2,83 @@ import os
 import sys
 import asyncio
 import typer
+import requests
+import shutil
+from pathlib import Path
+from packaging import version
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
+from rich.progress import Progress
+from rich.table import Table # Added for history command
 from typing import Optional
 from app.agents.orchestrator import Orchestrator
+from app.core.memory import Memory # Added for history/clear commands
+
+# Constantes
+CURRENT_VERSION = "2.2.0" # À mettre à jour à chaque release
+GITHUB_REPO = "mjcc30/sensei"
 
 # Initialisation de l'App CLI
 app = typer.Typer(help="Sensei - The AI Cyber Mentor 🥋")
 console = Console()
+
+# --- CLI Commands ---
+
+@app.command()
+def history(session_id: Optional[str] = None):
+    """
+    List past conversation sessions or display messages from a specific session.
+    """
+    memory = Memory()
+    if session_id:
+        console.print(f"[bold]History for session: {session_id}[/bold]")
+        messages = memory.get_history(session_id=session_id)
+        if not messages:
+            console.print("No messages found for this session.")
+            return
+        for msg in messages:
+            role_color = "blue" if msg["role"] == "user" else "green"
+            console.print(f"[{role_color}]{msg["role"]}:[/] {msg["parts"][0]}")
+    else:
+        console.print("[bold]Recent Conversation Sessions:[/bold]")
+        sessions = memory.list_sessions()
+        if not sessions:
+            console.print("No sessions found.")
+            return
+        
+        table = Table(title="Sessions", show_lines=True)
+        table.add_column("ID", style="cyan")
+        table.add_column("Title", style="magenta")
+        table.add_column("Last Active", style="yellow")
+        for s_id, title, last_active in sessions:
+            table.add_row(s_id, title, last_active)
+        console.print(table)
+
+
+@app.command()
+def clear(all: bool = False, session_id: Optional[str] = None):
+    """
+    Clear conversation history (all sessions or a specific one).
+    """
+    memory = Memory()
+    if all:
+        confirm = typer.confirm("[red]Are you sure you want to delete ALL conversation history?[/red]")
+        if confirm:
+            memory.clear_all_history()
+            console.print("[green]All conversation history cleared.[/green]")
+        else:
+            console.print("Operation cancelled.")
+    elif session_id:
+        confirm = typer.confirm(f"[red]Are you sure you want to delete session {session_id}?[/red]")
+        if confirm:
+            memory.clear_session(session_id)
+            console.print(f"[green]Session {session_id} cleared.[/green]")
+        else:
+            console.print("Operation cancelled.")
+    else:
+        console.print("[yellow]Please specify --all or --session <ID> to clear history.[/yellow]")
+
 
 @app.command()
 def ask(
