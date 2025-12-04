@@ -2,11 +2,15 @@ import os
 import sys
 import asyncio
 import typer
+from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from typing import Optional
 from app.agents.orchestrator import Orchestrator
+
+# Charger les variables d'environnement (.env)
+load_dotenv()
 
 # Initialisation de l'App CLI
 app = typer.Typer(help="Sensei - The AI Cyber Mentor 🥋")
