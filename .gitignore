@@ -10,3 +10,9 @@ wheels/
 .venv
 prompts.yaml
 .env
+main.dist/
+sensei
+*.zip
+.coverage
+nuitka-crash-report.xml
+node_modules/
