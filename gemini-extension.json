@@ -1,0 +1,29 @@
+{
+  "id": "sensei-extension",
+  "name": "Sensei Cyber Mentor",
+  "description": "An AI cybersecurity mentor integrated with Blackfin OS tools.",
+  "version": "1.0.0",
+  "entryPoint": "run.sh",
+  "tools": [
+    {
+      "name": "ask_sensei",
+      "description": "Ask a cybersecurity question to Sensei.",
+      "parameters": {
+        "question": {
+          "type": "string",
+          "description": "The question to ask."
+        }
+      }
+    },
+    {
+      "name": "scan_target",
+      "description": "Scan a target IP using Nmap (Simulated for safety first).",
+      "parameters": {
+        "target": {
+          "type": "string",
+          "description": "IP or Hostname to scan."
+        }
+      }
+    }
+  ]
+}
