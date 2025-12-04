@@ -2,7 +2,7 @@ import sqlite3
 import json
 import uuid
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -97,7 +97,22 @@ class Memory:
         # Format for Gemini: [{"role": "user", "parts": [...]}, ...]
         return [{"role": row[0], "parts": [row[1]]} for row in rows]
 
-    def list_sessions(self):
+    def list_sessions(self) -> List[Tuple[str, str, str]]:
         """Returns recent conversations."""
         self.cursor.execute("SELECT id, title, last_active FROM sessions ORDER BY last_active DESC LIMIT 10")
         return self.cursor.fetchall()
+
+    def clear_all_history(self):
+        """Deletes all messages and sessions from the database."""
+        self.cursor.execute("DELETE FROM messages")
+        self.cursor.execute("DELETE FROM sessions")
+        self.conn.commit()
+        self.current_session_id = None
+
+    def clear_session(self, session_id: str):
+        """Deletes messages and a specific session from the database."""
+        self.cursor.execute("DELETE FROM messages WHERE session_id = ?", (session_id,))
+        self.cursor.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
+        self.conn.commit()
+        if self.current_session_id == session_id:
+            self.current_session_id = None

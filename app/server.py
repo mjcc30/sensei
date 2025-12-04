@@ -18,5 +18,5 @@ def nmap_scan(target: str, quick: bool = True) -> str:
     return nmap_tool.run(target, quick)
 
 if __name__ == "__main__":
-    # Par défaut, FastMCP écoute sur stdio
+    # Run on stdio by default (Standard for local MCP)
     mcp.run()

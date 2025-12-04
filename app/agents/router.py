@@ -12,9 +12,9 @@ class RouterAgent(BaseAgent):
     
     Task:
     1. Analyze the user input.
-    2. Classify it into: NOVICE, RESEARCHER, MASTER, ACTION, SYSTEM, CASUAL.
+    2. Classify it into: NOVICE, RED, BLUE, OSINT, CLOUD, CRYPTO, ACTION, SYSTEM, CASUAL.
     3. REPHRASE the query into a formal "Research Request" ONLY IF it is technical.
-       If CASUAL or SYSTEM, keep the query as is.
+       If CASUAL, SYSTEM or ACTION, keep the query as is.
     
     Output strictly JSON: {"category": "...", "enhanced_query": "..."}
     """

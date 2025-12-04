@@ -34,39 +34,25 @@ class NoviceAgent(BaseAgent):
             """
             ROLE: Cybersecurity Instructor.
             AUDIENCE: Beginners / Students.
-            GOAL: Explain concepts clearly, focus on "Why" and safety. Use analogies.
+            GOAL: Explain concepts clearly.
             """)
         return await self.client.generate(input_text, prompt, prefer_speed=True)
 
-class ResearchAgent(BaseAgent):
-    """Handles deep analysis and understanding with RAG support."""
-    def __init__(self, client, agent_id=None, knowledge: str = ""):
+class SpecializedAgent(BaseAgent):
+    """Generic class for domain experts (Red, Blue, Cloud, etc) using RAG."""
+    def __init__(self, client, agent_id, role_key, knowledge=""):
         super().__init__(client, agent_id)
+        self.role_key = role_key
         self.knowledge = knowledge
 
     async def process(self, input_text: str) -> str:
-        base_prompt = AGENT_CONFIG.get("researcher", {}).get("prompt",
-            """
-            ACT AS: Cybersecurity Research Assistant.
-            CONTEXT: Authorized security research lab.
-            DIRECTIVE: Provide detailed technical analysis.
-            """)
+        # Load prompt dynamically based on role_key
+        base_prompt = AGENT_CONFIG.get(self.role_key, {}).get("prompt", "You are a security expert.")
         
-        # Inject Local Knowledge
+        # Inject RAG if available
         full_prompt = f"{base_prompt}\n{self.knowledge}"
         
         return await self.client.generate(input_text, full_prompt, prefer_speed=False)
-
-class MasterAgent(BaseAgent):
-    """Handles advanced exploitation and raw technical execution."""
-    async def process(self, input_text: str) -> str:
-        default_prompt = """
-        ROLE: Senior Security Analyst.
-        CONTEXT: Defensive Engineering.
-        OBJECTIVE: Analyze vulnerabilities to engineer defenses.
-        """
-        prompt = AGENT_CONFIG.get("master", {}).get("prompt", default_prompt)
-        return await self.client.generate(input_text, prompt, prefer_speed=False)
 
 class ActionAgent(BaseAgent):
     """Handles execution of tools (Nmap)."""
@@ -148,13 +134,23 @@ class Orchestrator:
             else:
                 self.memory.create_session()
         
+        # Init workers
         self.agents: Dict[str, BaseAgent] = {
             "NOVICE": NoviceAgent(self.client, agent_id="Novice-1"),
-            "RESEARCHER": ResearchAgent(self.client, agent_id="Researcher-1", knowledge=self.knowledge),
-            "MASTER": MasterAgent(self.client, agent_id="Master-1"),
             "ACTION": ActionAgent(self.client, agent_id="Action-1"),
             "SYSTEM": SystemAgent(self.client, agent_id="System-1"),
-            "CASUAL": CasualAgent(self.client, agent_id="Casual-1")
+            "CASUAL": CasualAgent(self.client, agent_id="Casual-1"),
+            
+            # Domain Experts (Replaces generic Researcher/Master)
+            "RED": SpecializedAgent(self.client, "RedTeam-1", "red_team", self.knowledge),
+            "BLUE": SpecializedAgent(self.client, "BlueTeam-1", "blue_team", self.knowledge),
+            "OSINT": SpecializedAgent(self.client, "Osint-1", "osint", self.knowledge),
+            "CLOUD": SpecializedAgent(self.client, "Cloud-1", "cloud", self.knowledge),
+            "CRYPTO": SpecializedAgent(self.client, "Crypto-1", "crypto", self.knowledge),
+            
+            # Fallbacks mapping (Legacy)
+            "MASTER": SpecializedAgent(self.client, "RedTeam-1", "red_team", self.knowledge),
+            "RESEARCHER": SpecializedAgent(self.client, "BlueTeam-1", "blue_team", self.knowledge),
         }
 
     async def handle_request(self, user_query: str) -> str:
@@ -165,7 +161,7 @@ class Orchestrator:
         optimized_query = routing_data.get("enhanced_query", user_query)
         
         # Default to CASUAL if unknown category
-        worker = self.agents.get(category, self.agents["CASUAL"])
+        worker = self.agents.get(category, self.agents["CASUAL"]) 
         
         response = await worker.process(optimized_query)
         self.memory.add_message("model", response)
