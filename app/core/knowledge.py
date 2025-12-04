@@ -1,10 +1,18 @@
 import sqlite3
-import sqlite_vec
 import google.generativeai as genai
 import struct
 import os
 from pathlib import Path
 from typing import List
+
+# Try to import sqlite-vec, but handle failure gracefully for CI/Testing environments
+try:
+    import sqlite_vec
+    HAS_VEC = True
+except ImportError:
+    sqlite_vec = None
+    HAS_VEC = False
+    print("[Warning] sqlite-vec module not found. Vector search features will be disabled.")
 
 DB_PATH = Path.home() / ".local" / "share" / "sensei" / "knowledge.db"
 
@@ -35,7 +43,13 @@ class LocalKnowledge:
             
         self.conn = sqlite3.connect(DB_PATH)
         self.conn.enable_load_extension(True)
-        sqlite_vec.load(self.conn)
+        
+        # Only load extension if available
+        if HAS_VEC:
+            try:
+                sqlite_vec.load(self.conn)
+            except Exception as e:
+                print(f"[Warning] Failed to load sqlite-vec extension: {e}")
         
         self.conn.execute("""
             CREATE TABLE IF NOT EXISTS documents (
@@ -46,7 +60,8 @@ class LocalKnowledge:
             )
         """)
         
-        self.conn.execute("""CREATE VIRTUAL TABLE IF NOT EXISTS vec_items USING vec0(
+        if HAS_VEC:
+            self.conn.execute("""CREATE VIRTUAL TABLE IF NOT EXISTS vec_items USING vec0(
                 embedding FLOAT[768]
             )""")
         self.conn.commit()
@@ -88,10 +103,11 @@ class LocalKnowledge:
             )
             row_id = cursor.lastrowid
             
-            self.conn.execute(
-                "INSERT INTO vec_items(rowid, embedding) VALUES (?, ?)",
-                (row_id, serialize_float32(embedding))
-            )
+            if HAS_VEC:
+                self.conn.execute(
+                    "INSERT INTO vec_items(rowid, embedding) VALUES (?, ?)",
+                    (row_id, serialize_float32(embedding))
+                )
             self.conn.commit()
             
         except Exception as e:
@@ -104,6 +120,9 @@ class LocalKnowledge:
     def search(self, query: str, limit: int = 3) -> str:
         if not self.api_key:
             return ""
+        
+        if not HAS_VEC:
+            return "Vector search unavailable (sqlite-vec missing)."
             
         query_embedding = self._get_embedding(query, task_type="retrieval_query")
         
