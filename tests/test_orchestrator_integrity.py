@@ -29,6 +29,7 @@ def test_orchestrator_initialization(mock_client):
         assert "NOVICE" in orch.agents
         assert "CASUAL" in orch.agents
         assert "ACTION" in orch.agents
+        assert "SYSTEM" in orch.agents
         
         print("✅ Orchestrator Integrity Check Passed")
 

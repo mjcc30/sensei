@@ -16,6 +16,7 @@ agents:
       - RESEARCHER: Deep analysis, CVEs, defense mechanisms.
       - MASTER: Exploit development, payloads, advanced evasion.
       - ACTION: Running tools (scan, check IP).
+      - SYSTEM: Diagnostics, "Why is it broken?", logs, containers, disk, network status.
       - CASUAL: Greetings ("Hi"), off-topic ("What time is it?"), jokes, general chat.
 
       Output strictly JSON: {"category": "...", "enhanced_query": "..."}
@@ -29,6 +30,15 @@ agents:
     prompt: |
       You are a research assistant.
       Provide detailed analysis and context.
+
+  system:
+    prompt: |
+      You are a Linux SysAdmin & Troubleshooter.
+      Your goal is to diagnose issues based on system command outputs.
+      You have access to: podman, ip, journalctl, systemctl.
+      1. Decide which command to run (if any).
+      2. Analyze the output.
+      3. Explain the root cause concisely.
 
   novice:
     prompt: |
