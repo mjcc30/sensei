@@ -1,14 +1,12 @@
 # Sensei Development Roadmap
 
-## 📅 Status: Q4 2025 - v1.0 Released
+## 📅 Status: Q4 2025 - v2.2.0 Released
 
-Sensei is currently a Single-Agent CLI tool. The goal is to evolve it into a Multi-Agent Orchestrator.
+Sensei is now a Multi-Agent Orchestrator with persistent memory and vector RAG.
 
 ---
 
 ## 🎯 v2.0 - The Swarm (Active Development)
-
-> Branch: `v2-swarm`
 
 ### ✅ Phase 1: Core Architecture (Done)
 
@@ -19,8 +17,8 @@ Sensei is currently a Single-Agent CLI tool. The goal is to evolve it into a Mul
 
 ### 🔌 Phase 2: Tooling & MCP (Infrastructure First)
 
-- [ ] **MCP Server:** Expose local tools (Nmap, Searchsploit) via Model Context Protocol.
-- [ ] **ActionAgent:** Create an agent capable of executing safe commands via MCP.
+- [x] **MCP Server:** Expose local tools (Nmap) via Model Context Protocol (`app/server.py`).
+- [ ] **ActionAgent Client:** Refactor ActionAgent to communicate with the MCP Server via JSON-RPC (Currently uses direct Python import).
 
 ### 🚧 Phase 3: Domain Specialization (Option B)
 
@@ -59,18 +57,9 @@ Sensei is currently a Single-Agent CLI tool. The goal is to evolve it into a Mul
 
 ---
 
-## 🛠️ v1.x - Enhancements
+## 🛠️ v2.2.0 - Enhancements
 
+- [x] **Persistent Memory:** Sensei now remembers past conversations using SQLite.
+- [x] **Vector RAG:** Local documentation is indexed via `sqlite-vec` and Gemini Embeddings.
 - [ ] **Local LLM Support:** Add support for Ollama/Llama.cpp via `langchain` or direct API.
-- [ ] **Conversation History:** Persist chat history between sessions (local SQLite or JSON).
-- [ ] **RAG (Retrieval Augmented Generation):** Allow Sensei to index local documentation (`/usr/share/doc/blackfin`) for better answers.
 - [ ] **Blackfin Integration:** Add a specific tool to control `ghost-shell` directly from Sensei.
-
----
-
-## 📝 Changelog
-
-### v1.0.0
-
-- Initial Release.
-- Features: Smart Fallback, Interactive Chat, CLI Mode.
