@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from typing import Optional
-from sensei.agents.orchestrator import Orchestrator
+from app.agents.orchestrator import Orchestrator
 
 # Initialisation de l'App CLI
 app = typer.Typer(help="Sensei - The AI Cyber Mentor 🥋")

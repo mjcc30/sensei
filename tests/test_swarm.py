@@ -1,7 +1,7 @@
 import pytest
 import os
 import asyncio
-from sensei.agents.orchestrator import Orchestrator
+from app.agents.orchestrator import Orchestrator
 
 # Nécessite une clé API pour les tests d'intégration réels
 API_KEY = os.getenv("GEMINI_API_KEY")

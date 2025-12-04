@@ -11,4 +11,4 @@ fi
 # Lance le mode chat ou l'outil demandé
 # Note: Pour une vraie intégration MCP, il faudrait un serveur stdio/http.
 # Ici, on lance simplement l'outil.
-uv run main.py chat --key "$GEMINI_API_KEY"
+uv run app/main.py chat --key "$GEMINI_API_KEY"

@@ -28,6 +28,11 @@ jobs:
     - name: Run Unit Tests
       run: uv run pytest tests/test_cli.py
 
+    - name: Smoke Test (CLI)
+      run: |
+        # Vérifie que l'app se lance et affiche l'aide
+        uv run app/main.py --help
+
     - name: Validate Extension Manifest
       run: |
         # Vérifie que le JSON est valide
@@ -42,7 +47,7 @@ jobs:
         # Si la clé est présente, on fait un vrai test
         if [ -n "$GEMINI_API_KEY" ]; then
           echo "🔑 API Key found. Running integration test..."
-          uv run main.py ask "Hello Sensei, are you online?"
+          uv run app/main.py ask "Hello Sensei, are you online?"
         else
           echo "⚠️ No API Key found in secrets. Skipping integration test."
         fi

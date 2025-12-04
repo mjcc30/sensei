@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, AsyncMock, patch
 # Hack pour inclure le dossier parent dans le path (Prioritaire)
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from sensei.main import app
+from app.main import app
 
 runner = CliRunner()
 
@@ -26,7 +26,7 @@ def test_ask_command_success(mocker):
     mock_orch.handle_request = AsyncMock(return_value="[MockAgent] This is a mocked response.")
     
     # On patch la classe Orchestrator dans main.py pour qu'elle renvoie notre mock
-    mocker.patch("sensei.main.Orchestrator", return_value=mock_orch)
+    mocker.patch("app.main.Orchestrator", return_value=mock_orch)
 
     # On lance la commande avec une fausse clé
     result = runner.invoke(app, ["ask", "Hello", "--key", "fake-key"])
