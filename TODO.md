@@ -6,21 +6,32 @@ Sensei is currently a Single-Agent CLI tool. The goal is to evolve it into a Mul
 
 ---
 
-## 🎯 v2.0 - The Swarm (R&D)
-> Inspired by [Gemini Flow](https://github.com/clduab11/gemini-flow).
+## 🎯 v2.0 - The Swarm (Active Development)
+> Branch: `v2-swarm`
 
-- [ ] **Architecture Transition:**
-    - Refactor `main.py` to support multiple agent classes.
-    - Implement a Supervisor Agent (Orchestrator).
+### ✅ Phase 1: Core Architecture (Done)
+- [x] **A2A Bus:** Implemented lightweight async message bus (`core/a2a.py`).
+- [x] **Orchestrator:** 3-Tier Routing Logic (Novice / Researcher / Master).
+- [x] **Adaptive Persona:** Dynamic system prompts based on user intent (Pedagogy vs Unrestricted).
+- [x] **TDD:** Integration tests validation (`tests/test_swarm.py`).
 
+### 🚧 Phase 2: Domain Specialization (Option B)
+- [ ] **Domain Router:** Upgrade RouterAgent to classify by Domain (Red/Blue/OSINT/Cloud/Crypto).
 - [ ] **Specialized Agents:**
-    - `ReconAgent`: Specialized in Nmap, Masscan, Whois.
-    - `ExploitAgent`: Specialized in Searchsploit, Metasploit, CVEs.
-    - `ReportAgent`: Specialized in summarizing findings into Markdown/SysReptor format.
+    - `RedTeamMaster`: Focus on Exploitation & Evasion.
+    - `BlueTeamResearcher`: Focus on Forensics, Logs Analysis & Defense.
+    - `OsintAgent`: Focus on Recon & Intel.
+    - `CloudAgent`: Focus on AWS/Azure/GCP misconfigurations.
+    - `CryptoAgent`: Focus on Cryptography, Steganography & Mathematics.
 
-- [ ] **Protocols:**
-    - **MCP (Model Context Protocol):** Implement a standardized way for agents to share scan results (JSON/XML).
-    - **A2A (Agent-to-Agent):** Enable agents to query each other (e.g., ExploitAgent asks ReconAgent for open ports).
+### 🔌 Phase 3: Tooling & MCP
+- [ ] **MCP Server:** Expose local tools (Nmap, Searchsploit) via Model Context Protocol.
+- [ ] **ActionAgent:** Create an agent capable of executing safe commands via MCP.
+
+### 🚀 Phase 4: Release
+- [ ] **Merge:** Integrate `v2-swarm` into `main.py`.
+- [ ] **Release:** v2.0.0.
+
 
 ---
 
