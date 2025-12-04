@@ -53,6 +53,13 @@ Sensei is now a Multi-Agent Orchestrator with persistent memory and vector RAG.
 
 ### 🧹 Technical Debt & Refactoring
 
+- [ ] **Fix: MCP Server Integration Tests**
+  - Develop a robust MCP Client test harness using the official `mcp` Python SDK (client part) to connect to `app/server.py`.
+
+  - Ensure the test performs the full MCP client-server handshake, lists tools, and calls a tool (`nmap_scan`).
+
+  - Validate Docker integration (`sensei-mcp` image).
+
 - [ ] **Dynamic Versioning:** Stop hardcoding version strings in `main.py`. Read from `pyproject.toml` (Python) or `Cargo.toml` (Rust).
 
 ---
