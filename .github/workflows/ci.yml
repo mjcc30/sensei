@@ -27,6 +27,11 @@ jobs:
         # Vérifie que l'app se lance et affiche l'aide
         uv run main.py --help
 
+    - name: Run Unit Tests
+      env:
+        PYTHONPATH: .
+      run: uv run pytest tests/test_cli.py
+
     - name: Validate Extension Manifest
       run: |
         # Vérifie que le JSON est valide
