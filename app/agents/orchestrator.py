@@ -96,7 +96,24 @@ class CasualAgent(BaseAgent):
 
 class Orchestrator:
     def __init__(self, api_key: str, session_id: str = None):
-        # ... (init code)
+        self.client = GeminiClient(api_key)
+        
+        # Load Router Prompt from Config
+        router_prompt = AGENT_CONFIG.get("router", {}).get("prompt")
+        self.router = RouterAgent(self.client, prompt_template=router_prompt)
+        
+        self.knowledge = LocalKnowledge().get_context()
+        self.memory = Memory()
+        
+        # Resume or Start Session
+        if session_id:
+            self.memory.current_session_id = session_id
+        elif not self.memory.current_session_id:
+            last_id = self.memory.get_last_session()
+            if last_id:
+                self.memory.current_session_id = last_id
+            else:
+                self.memory.create_session()
         
         # Init workers
         self.agents: Dict[str, BaseAgent] = {
@@ -120,11 +137,11 @@ class Orchestrator:
         optimized_query = routing_data.get("enhanced_query", user_query)
         
         # 2. Delegation
-        # Default to CASUAL if unknown, or RESEARCHER? 
+        # Default to CASUAL if unknown, or RESEARCHER?
         # If the user says "giberish", RESEARCHER might be overkill.
         # Let's default to CASUAL if category is not found, unless it's a routed tech query.
         # Actually, sticking to RESEARCHER as fallback is safer for a Cyber Tool, but let's trust the Router.
-        worker = self.agents.get(category, self.agents["CASUAL"]) 
+        worker = self.agents.get(category, self.agents["CASUAL"])
         
         # 3. Execution
         response = await worker.process(optimized_query)
