@@ -89,20 +89,15 @@ jobs:
           fi
 
       - name: Compile with Nuitka
-        # Temporarily commented out Nuitka compilation
-        # run: uv run --python 3.14 python -m nuitka \
-        #   --standalone \
-        #   --onefile \
-        #   --include-data-file=prompts.yaml=prompts.yaml \
-        #   --include-package=pygments \
-        #   --output-filename=sensei app/main.py
-        run: echo "Nuitka compilation temporarily disabled."
+        run: |
+          uv run --python 3.12 python -m nuitka \
+            --standalone \
+            --onefile \
+            --include-data-file=prompts.yaml=prompts.yaml \
+            --include-package=pygments \
+            --output-filename=sensei app/main.py
 
       - name: Upload Binary
-        # This step will now upload a dummy file or an existing binary if Nuitka is disabled.
-        # Need to ensure there's a 'sensei' file if Nuitka is commented out, or skip this step.
-        # For now, let's assume if Nuitka is commented, we don't upload a binary.
-        if: false # Skip upload if Nuitka is disabled
         uses: actions/upload-artifact@v5
         with:
           name: sensei-linux-x64
