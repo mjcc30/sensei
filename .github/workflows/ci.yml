@@ -85,7 +85,7 @@ jobs:
 
       - name: Compile with Nuitka
         run: |
-          uv run --python 3.12 python -m nuitka --standalone --onefile --include-data-file=prompts.yaml=prompts.yaml --output-filename=sensei app/main.py
+          uv run --python 3.12 python -m nuitka --standalone --onefile --include-data-file=prompts.yaml=prompts.yaml --include-package=pygments --output-filename=sensei app/main.py
 
       - name: Upload Binary
         uses: actions/upload-artifact@v4
