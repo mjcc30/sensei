@@ -102,12 +102,17 @@ class Orchestrator:
         }
 
     async def handle_request(self, user_query: str) -> str:
-        # 1. Routing
-        category = await self.router.process(user_query)
+        # 1. Routing & Optimization
+        routing_data = await self.router.process(user_query)
+        category = routing_data["category"]
+        optimized_query = routing_data["enhanced_query"]
+        
+        # print(f"[Orchestrator] Routed to: {category}")
+        # print(f"[Orchestrator] Optimized Prompt: {optimized_query}")
         
         # 2. Delegation
         worker = self.agents.get(category, self.agents["RESEARCHER"])
         
-        # 3. Execution
-        response = await worker.process(user_query)
+        # 3. Execution (Using the optimized query)
+        response = await worker.process(optimized_query)
         return f"[{worker.id}] {response}"
