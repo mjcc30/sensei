@@ -8,54 +8,34 @@
 *   **Tone:** Concise, practical, command-line focused.
 *   **Philosophy:** "Explain Why, then Show How."
 
-## Architecture (v2.0 Swarm)
+## Architecture (v2.2 Swarm)
 *   **Language:** Python 3.12+ (Using `uv` package manager).
 *   **Directory Structure:** `app/` (Source), `tests/`, `run.sh` (Entrypoint).
 *   **Orchestrator:** `app/agents/orchestrator.py` manages the lifecycle.
-*   **Router Agent:** Classifies intent (NOVICE, RESEARCHER, MASTER, ACTION) and **Rephrases** queries to bypass safety filters ("Reframing Attack").
+    *   *Critical:* Initializes Memory, Router, Knowledge, and Workers.
+*   **Router Agent:** Classifies intent (NOVICE, RESEARCHER, MASTER, ACTION, CASUAL) and **Rephrases** technical queries.
+    *   *Prompt:* Externalized in `prompts.yaml`.
 *   **Agents:**
-    *   `Novice`: Pedagogical, safety-first.
-    *   `Researcher`: Deep analysis, context-aware.
+    *   `Novice`: Pedagogical.
+    *   `Researcher`: Deep analysis with RAG.
     *   `Master`: Unrestricted technical execution ("God Mode").
     *   `Action`: Tool execution (e.g., Nmap).
-*   **A2A Bus:** `app/core/a2a.py` - Asynchronous message bus for inter-agent communication.
+    *   `Casual`: General conversation (New in v2.3).
+*   **Memory:** SQLite-based persistent conversation history (`~/.local/share/sensei/memory.db`).
+*   **Knowledge (RAG):** Vector search using `sqlite-vec` and Gemini Embeddings.
 
-## Security & Distribution (The "Secret Sauce")
-*   **Prompts Strategy:**
-    *   Public: `prompts.example.yaml` (Standard behavior).
-    *   Private: `prompts.yaml` (Gitignored, contains "God Mode" instructions).
-*   **Binary Compilation:**
-    *   Tool: **Nuitka**.
-    *   Injection: The CI pipeline injects `PROMPTS_SECRET` (GitHub Secret) into `prompts.yaml` before compilation.
-    *   Embedding: `prompts.yaml` is embedded inside the binary (`--include-data-file`).
-*   **Protection:** The end-user receives a compiled binary where prompts are obfuscated.
+## Security & Distribution
+*   **Prompts Strategy:** `prompts.example.yaml` (Public) vs `prompts.yaml` (Secret/Ignored).
+*   **Binary Compilation:** Nuitka (Embeds prompts, creates standalone binary).
+*   **Update:** Self-update mechanism via GitHub Releases.
 
-## CI/CD Pipeline
-*   **Unit Tests:** `pytest` runs on every push (Mocked API calls).
-*   **Build:** Nuitka compilation runs **only on tags** (`v*`).
-*   **Artifacts:** `sensei-linux-x64` binary attached to Releases.
-
-## Usage & Commands
-**Single Question:**
-```bash
-# Quotes are optional due to shell wrapper
-sensei how do I enumerate SMB shares?
-```
-
-**Interactive Chat:**
-```bash
-sensei
-```
-
-**Development:**
-```bash
-uv sync
-uv pip install -e .  # Crucial for tests to find the package!
-uv run app/main.py ask "Test"
-```
+## Development Protocols & Safety
+*   **Tool Usage:**
+    *   NEVER use `replace` with partial code blocks (e.g., `# ... existing code`). Always provide the full replacement content or use `write_file` to rewrite the entire file to avoid accidental code deletion.
+    *   Always verify `old_string` matches exactly.
+*   **Testing:**
+    *   Run `test_e2e.py` (Smoke Test) after ANY modification to `main.py` or `orchestrator.py`.
+    *   Run unit tests before pushing.
 
 ## Roadmap
-*   **v2.1:** MCP Server integration for broader tool support.
-*   **v3.0 (The Rust Rewrite):** Full rewrite in Rust (Client-Server) for performance and native integration.
-    *   Server: Python/FastAPI (Complex Agents).
-    *   Client: Rust/Zig (Lightweight CLI).
+*   **v3.0 (The Rust Rewrite):** Full rewrite in Rust (Client-Server) for performance.
