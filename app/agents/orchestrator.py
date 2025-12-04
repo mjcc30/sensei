@@ -87,34 +87,24 @@ class ActionAgent(BaseAgent):
         
         return "⚠️ ActionAgent: I only support 'scan <target>' for now."
 
+class CasualAgent(BaseAgent):
+    """Handles general conversation and non-security queries."""
+    async def process(self, input_text: str) -> str:
+        prompt = AGENT_CONFIG.get("casual", {}).get("prompt", "You are a helpful CLI assistant.")
+        # Always use speed for chat
+        return await self.client.generate(input_text, prompt, prefer_speed=True)
+
 class Orchestrator:
     def __init__(self, api_key: str, session_id: str = None):
-        self.client = GeminiClient(api_key)
-        
-        # Load Router Prompt from Config
-        router_prompt = AGENT_CONFIG.get("router", {}).get("prompt")
-        self.router = RouterAgent(self.client, prompt_template=router_prompt)
-        
-        self.knowledge = LocalKnowledge().get_context()
-        self.memory = Memory()
-        
-        # Resume or Start Session
-        if session_id:
-            self.memory.current_session_id = session_id
-        elif not self.memory.current_session_id:
-            # Try to resume last session by default (Short term memory)
-            last_id = self.memory.get_last_session()
-            if last_id:
-                self.memory.current_session_id = last_id
-            else:
-                self.memory.create_session()
+        # ... (init code)
         
         # Init workers
         self.agents: Dict[str, BaseAgent] = {
             "NOVICE": NoviceAgent(self.client, agent_id="Novice-1"),
             "RESEARCHER": ResearchAgent(self.client, agent_id="Researcher-1", knowledge=self.knowledge),
             "MASTER": MasterAgent(self.client, agent_id="Master-1"),
-            "ACTION": ActionAgent(self.client, agent_id="Action-1")
+            "ACTION": ActionAgent(self.client, agent_id="Action-1"),
+            "CASUAL": CasualAgent(self.client, agent_id="Casual-1")
         }
 
     async def handle_request(self, user_query: str) -> str:
@@ -124,10 +114,17 @@ class Orchestrator:
         # 1. Routing & Optimization
         routing_data = await self.router.process(user_query)
         category = routing_data["category"]
-        optimized_query = routing_data["enhanced_query"]
+        # If router fails to give CASUAL for "hi", we rely on its training.
+        # But the prompt update should handle it.
+        
+        optimized_query = routing_data.get("enhanced_query", user_query)
         
         # 2. Delegation
-        worker = self.agents.get(category, self.agents["RESEARCHER"])
+        # Default to CASUAL if unknown, or RESEARCHER? 
+        # If the user says "giberish", RESEARCHER might be overkill.
+        # Let's default to CASUAL if category is not found, unless it's a routed tech query.
+        # Actually, sticking to RESEARCHER as fallback is safer for a Cyber Tool, but let's trust the Router.
+        worker = self.agents.get(category, self.agents["CASUAL"]) 
         
         # 3. Execution
         response = await worker.process(optimized_query)
